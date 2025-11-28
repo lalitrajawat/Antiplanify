@@ -1,35 +1,52 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
-import { Link } from 'react-router-dom';
-import { Plus, Calendar, CheckCircle, Clock } from 'lucide-react';
-import { format } from 'date-fns';
-import './Home.css';
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
+import { Link } from "react-router-dom";
+import {
+    Plus,
+    Calendar,
+    CheckCircle,
+    Clock,
+    Bell,
+    LayoutDashboard,
+    ListTodo,
+} from "lucide-react";
+import { format } from "date-fns";
+import "./Home.css";
 
 const Home = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState({
         totalProjects: 0,
         tasksDueToday: 0,
-        completedTasks: 0
+        completedTasks: 0,
     });
+
     const [pinnedProjects, setPinnedProjects] = useState([]);
     const [todayTasks, setTodayTasks] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // In a real app, we'd have specific endpoints for stats
-                // For now, we'll fetch all projects and calculate locally or fetch from a dashboard endpoint
-                // Let's assume we fetch projects and tasks separately for now
-                const { data: projects } = await api.get('/projects');
-                const pinned = projects.filter(p => p.pinned);
+                const { data: projects } = await api.get("/projects");
+                const pinned = projects.filter((p) => p.pinned);
                 setPinnedProjects(pinned);
-                setStats(prev => ({ ...prev, totalProjects: projects.length }));
 
-                // Fetch tasks (we might need a 'get all tasks' endpoint or iterate projects)
-                // For simplicity, let's just show static stats or fetch from a new endpoint if we had one
-                // I'll implement a simple dashboard endpoint logic here by fetching projects
+                // Simple derived stats (adjust later when you have real tasks API)
+                const completed = projects.filter((p) => (p.progress || 0) === 100).length;
+
+                setStats((prev) => ({
+                    ...prev,
+                    totalProjects: projects.length,
+                    completedTasks: completed,
+                }));
+
+                // TEMP demo tasks – replace with real API when ready
+                setTodayTasks([
+                    { id: 1, title: "Design wireframes", priority: "High" },
+                    { id: 2, title: "Refactor task service", priority: "Medium" },
+                    { id: 3, title: "Update Gantt dates", priority: "Low" },
+                ]);
             } catch (error) {
                 console.error("Error fetching dashboard data", error);
             }
@@ -37,87 +54,263 @@ const Home = () => {
         fetchData();
     }, []);
 
+    const avgProgress =
+        pinnedProjects.length > 0
+            ? Math.round(
+                pinnedProjects.reduce((sum, p) => sum + (p.progress || 0), 0) /
+                pinnedProjects.length
+            )
+            : 0;
+
+    const tasksDueToday = todayTasks.length;
+
     return (
         <div className="home-container">
+            {/* Top header */}
             <div className="home-header">
-                <h1 className="home-title">Hello, {user?.name} 👋</h1>
-                <p className="home-date">{format(new Date(), 'EEEE, MMMM do, yyyy')}</p>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-icon blue">
-                        <Layout className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <p className="stat-label">Total Projects</p>
-                        <p className="stat-value">{stats.totalProjects}</p>
-                    </div>
+                <div>
+                    <p className="home-subtitle">Dashboard</p>
+                    <h1 className="home-title">
+                        Hello, <span className="highlight">{user?.name}</span> 👋
+                    </h1>
+                    <p className="home-date">
+                        <Calendar size={16} className="icon-inline" />
+                        {format(new Date(), "EEEE, MMMM do, yyyy")}
+                    </p>
                 </div>
-                <div className="stat-card">
-                    <div className="stat-icon red">
-                        <Clock className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <p className="stat-label">Tasks Due Today</p>
-                        <p className="stat-value">{stats.tasksDueToday}</p>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon green">
-                        <CheckCircle className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <p className="stat-label">Completed Tasks</p>
-                        <p className="stat-value">{stats.completedTasks}</p>
-                    </div>
+                <div className="home-header-right">
+                    <button className="ghost-btn">
+                        <Bell size={16} />
+                    </button>
+                    <Link to="/projects" className="primary-btn">
+                        <Plus size={16} />
+                        New Project
+                    </Link>
                 </div>
             </div>
 
-            {/* Pinned Projects */}
-            <div className="pinned-section">
-                <div className="section-header">
-                    <h2 className="section-title">Pinned Projects</h2>
-                    <Link to="/projects" className="view-all-link">View All</Link>
-                </div>
-                {pinnedProjects.length > 0 ? (
-                    <div className="projects-grid">
-                        {pinnedProjects.map(project => (
-                            <Link key={project._id} to={`/projects/${project._id}`} className="project-card-link group">
-                                <div className="project-card">
-                                    <div className="project-card-header">
-                                        <h3 className="project-title">{project.title}</h3>
-                                        <span className="tech-badge">{project.techStack[0]}</span>
+            {/* GRID LAYOUT */}
+            <div className="home-grid">
+                {/* Daily To-Do */}
+                <section className="panel panel-todo">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <ListTodo size={16} />
+                            </span>
+                            <h2 className="panel-title">Daily To-Do</h2>
+                        </div>
+                        <span className="panel-badge">
+                            {tasksDueToday} task{tasksDueToday !== 1 ? "s" : ""} today
+                        </span>
+                    </div>
+
+                    <ul className="todo-list">
+                        {todayTasks.map((task) => (
+                            <li key={task.id} className="todo-item">
+                                <div className="todo-left">
+                                    <input type="checkbox" className="todo-checkbox" />
+                                    <span className="todo-text">{task.title}</span>
+                                </div>
+                                <span className={`priority-pill ${task.priority.toLowerCase()}`}>
+                                    {task.priority}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+
+                {/* Project Progress circle */}
+                <section className="panel panel-progress">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <LayoutDashboard size={16} />
+                            </span>
+                            <h2 className="panel-title">Project Progress</h2>
+                        </div>
+                        <p className="panel-subtext">Average of pinned projects</p>
+                    </div>
+
+                    <div
+                        className="progress-circle"
+                        style={{ "--progress": avgProgress }}
+                    >
+                        <div className="progress-inner">
+                            <span className="progress-value">{avgProgress}%</span>
+                            <span className="progress-label">Overall</span>
+                        </div>
+                    </div>
+
+                    <div className="progress-meta">
+                        <div className="progress-meta-row">
+                            <span className="dot dot-purple"></span>
+                            <span>Total projects</span>
+                            <span className="meta-value">{stats.totalProjects}</span>
+                        </div>
+                        <div className="progress-meta-row">
+                            <span className="dot dot-green"></span>
+                            <span>Completed</span>
+                            <span className="meta-value">{stats.completedTasks}</span>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Notifications */}
+                <section className="panel panel-notifications">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <Bell size={16} />
+                            </span>
+                            <h2 className="panel-title">Notifications</h2>
+                        </div>
+                    </div>
+
+                    <ul className="notifications-list">
+                        <li className="notification-item">
+                            <p className="notification-title">Fix bugs in Task Manager</p>
+                            <span className="notification-meta">Today · 4:30 PM</span>
+                        </li>
+                        <li className="notification-item">
+                            <p className="notification-title">
+                                Project &quot;E-commerce Website&quot; marked as complete
+                            </p>
+                            <span className="notification-meta">Yesterday · 6:12 PM</span>
+                        </li>
+                        <li className="notification-item">
+                            <p className="notification-title">
+                                Upcoming deadline: &quot;Database setup&quot;
+                            </p>
+                            <span className="notification-meta">In 3 days</span>
+                        </li>
+                    </ul>
+                </section>
+
+                {/* Gantt-like progress (using pinned projects) */}
+                <section className="panel panel-gantt">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <Clock size={16} />
+                            </span>
+                            <h2 className="panel-title">Timeline Overview</h2>
+                        </div>
+                        <span className="panel-subtext">Pinned project progress</span>
+                    </div>
+
+                    {pinnedProjects.length > 0 ? (
+                        <div className="gantt-list">
+                            {pinnedProjects.map((project) => (
+                                <div key={project._id} className="gantt-row">
+                                    <div className="gantt-label">
+                                        <span className="gantt-title">{project.title}</span>
+                                        <span className="gantt-tech">
+                                            {project.techStack?.[0] || "General"}
+                                        </span>
                                     </div>
-                                    <p className="project-desc">{project.description}</p>
-                                    <div className="progress-bar-bg">
+                                    <div className="gantt-bar-track">
                                         <div
-                                            className="progress-bar-fill"
+                                            className="gantt-bar"
                                             style={{ width: `${project.progress || 0}%` }}
                                         ></div>
                                     </div>
                                 </div>
-                            </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="empty-mini">
+                            <p>No pinned projects to show in timeline.</p>
+                        </div>
+                    )}
+                </section>
+
+                {/* Tasks panel (mini cards) */}
+                <section className="panel panel-tasks">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <CheckCircle size={16} />
+                            </span>
+                            <h2 className="panel-title">Tasks</h2>
+                        </div>
+                        <span className="panel-subtext">Quick view</span>
+                    </div>
+
+                    <div className="task-list">
+                        {todayTasks.map((task) => (
+                            <div key={task.id} className="task-card">
+                                <div>
+                                    <p className="task-title">{task.title}</p>
+                                    <span className="task-status">Today</span>
+                                </div>
+                                <span className={`priority-pill ${task.priority.toLowerCase()}`}>
+                                    {task.priority}
+                                </span>
+                            </div>
                         ))}
                     </div>
-                ) : (
-                    <div className="empty-state">
-                        <p>No pinned projects yet.</p>
-                        <Link to="/projects" className="create-link">Create one?</Link>
+                </section>
+
+                {/* Pinned projects as cards */}
+                <section className="panel panel-projects">
+                    <div className="panel-header">
+                        <div className="panel-title-wrap">
+                            <span className="panel-icon">
+                                <LayoutDashboard size={16} />
+                            </span>
+                            <h2 className="panel-title">Pinned Projects</h2>
+                        </div>
+                        <Link to="/projects" className="panel-link">
+                            View all
+                        </Link>
                     </div>
-                )}
+
+                    {pinnedProjects.length > 0 ? (
+                        <div className="projects-grid">
+                            {pinnedProjects.map((project) => (
+                                <Link
+                                    key={project._id}
+                                    to={`/projects/${project._id}`}
+                                    className="project-pill"
+                                >
+                                    <div className="project-pill-main">
+                                        <span className="project-pill-title">{project.title}</span>
+                                        <span className="project-pill-tech">
+                                            {project.techStack?.[0] || "General"}
+                                        </span>
+                                    </div>
+                                    <div className="project-pill-meta">
+                                        <div className="pill-progress-track">
+                                            <div
+                                                className="pill-progress-fill"
+                                                style={{ width: `${project.progress || 0}%` }}
+                                            ></div>
+                                        </div>
+                                        <span className="pill-progress-label">
+                                            {project.progress || 0}% done
+                                        </span>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="empty-state">
+                            <p>No pinned projects yet.</p>
+                            <Link to="/projects" className="create-link">
+                                Create one?
+                            </Link>
+                        </div>
+                    )}
+                </section>
             </div>
+
+            {/* Floating + button */}
+            <Link to="/projects" className="floating-new-project">
+                <Plus size={20} />
+            </Link>
         </div>
     );
 };
-
-function Layout({ className }) {
-    return (
-        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-    );
-}
 
 export default Home;
