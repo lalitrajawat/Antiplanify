@@ -4,6 +4,7 @@ import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import { Plus, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import './Home.css';
 
 const Home = () => {
     const { user } = useAuth();
@@ -37,62 +38,62 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Hello, {user?.name} 👋</h1>
-                <p className="text-gray-500 mt-1">{format(new Date(), 'EEEE, MMMM do, yyyy')}</p>
+        <div className="home-container">
+            <div className="home-header">
+                <h1 className="home-title">Hello, {user?.name} 👋</h1>
+                <p className="home-date">{format(new Date(), 'EEEE, MMMM do, yyyy')}</p>
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-icon blue">
                         <Layout className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">Total Projects</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.totalProjects}</p>
+                        <p className="stat-label">Total Projects</p>
+                        <p className="stat-value">{stats.totalProjects}</p>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div className="p-3 bg-red-50 rounded-lg text-red-600">
+                <div className="stat-card">
+                    <div className="stat-icon red">
                         <Clock className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">Tasks Due Today</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.tasksDueToday}</p>
+                        <p className="stat-label">Tasks Due Today</p>
+                        <p className="stat-value">{stats.tasksDueToday}</p>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                    <div className="p-3 bg-green-50 rounded-lg text-green-600">
+                <div className="stat-card">
+                    <div className="stat-icon green">
                         <CheckCircle className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">Completed Tasks</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.completedTasks}</p>
+                        <p className="stat-label">Completed Tasks</p>
+                        <p className="stat-value">{stats.completedTasks}</p>
                     </div>
                 </div>
             </div>
 
             {/* Pinned Projects */}
-            <div className="mb-10">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-900">Pinned Projects</h2>
-                    <Link to="/projects" className="text-primary text-sm font-medium hover:text-indigo-600">View All</Link>
+            <div className="pinned-section">
+                <div className="section-header">
+                    <h2 className="section-title">Pinned Projects</h2>
+                    <Link to="/projects" className="view-all-link">View All</Link>
                 </div>
                 {pinnedProjects.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="projects-grid">
                         {pinnedProjects.map(project => (
-                            <Link key={project._id} to={`/projects/${project._id}`} className="block group">
-                                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="font-bold text-gray-900 group-hover:text-primary transition-colors">{project.title}</h3>
-                                        <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{project.techStack[0]}</span>
+                            <Link key={project._id} to={`/projects/${project._id}`} className="project-card-link group">
+                                <div className="project-card">
+                                    <div className="project-card-header">
+                                        <h3 className="project-title">{project.title}</h3>
+                                        <span className="tech-badge">{project.techStack[0]}</span>
                                     </div>
-                                    <p className="text-gray-500 text-sm line-clamp-2 mb-4">{project.description}</p>
-                                    <div className="w-full bg-gray-100 rounded-full h-2">
+                                    <p className="project-desc">{project.description}</p>
+                                    <div className="progress-bar-bg">
                                         <div
-                                            className="bg-primary h-2 rounded-full transition-all duration-500"
+                                            className="progress-bar-fill"
                                             style={{ width: `${project.progress || 0}%` }}
                                         ></div>
                                     </div>
@@ -101,9 +102,9 @@ const Home = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-10 bg-white rounded-xl border border-dashed border-gray-300">
-                        <p className="text-gray-500">No pinned projects yet.</p>
-                        <Link to="/projects" className="text-primary font-medium mt-2 inline-block">Create one?</Link>
+                    <div className="empty-state">
+                        <p>No pinned projects yet.</p>
+                        <Link to="/projects" className="create-link">Create one?</Link>
                     </div>
                 )}
             </div>

@@ -5,6 +5,7 @@ import { Calendar as CalendarIcon, List, BarChart2, CheckCircle as CheckCircleIc
 import { format } from 'date-fns';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import "gantt-task-react/dist/index.css";
+import './ProjectDetail.css';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -40,28 +41,28 @@ const ProjectDetail = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading project...</div>;
-    if (!project) return <div className="p-8 text-center">Project not found</div>;
+    if (loading) return <div className="loading-container">Loading project...</div>;
+    if (!project) return <div className="loading-container">Project not found</div>;
 
     return (
-        <div className="flex h-[calc(100vh-64px)]">
+        <div className="project-detail-container">
             {/* Sidebar */}
-            <div className="w-80 bg-white border-r border-gray-200 p-6 flex-shrink-0 overflow-y-auto">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{project.title}</h1>
-                <p className="text-gray-500 text-sm mb-6">{project.description}</p>
+            <div className="project-sidebar">
+                <h1 className="project-title">{project.title}</h1>
+                <p className="project-desc">{project.description}</p>
 
-                <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tech Stack</h3>
-                    <div className="flex flex-wrap gap-2">
+                <div className="sidebar-section">
+                    <h3 className="sidebar-section-title">Tech Stack</h3>
+                    <div className="tech-stack">
                         {project.techStack.map((tech, i) => (
-                            <span key={i} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{tech}</span>
+                            <span key={i} className="tech-badge">{tech}</span>
                         ))}
                     </div>
                 </div>
 
-                <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Timeline</h3>
-                    <div className="text-sm text-gray-600">
+                <div className="sidebar-section">
+                    <h3 className="sidebar-section-title">Timeline</h3>
+                    <div className="timeline-text">
                         <p>Start: {project.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : 'Not set'}</p>
                         <p>End: {project.endDate ? format(new Date(project.endDate), 'MMM d, yyyy') : 'Not set'}</p>
                     </div>
@@ -69,27 +70,27 @@ const ProjectDetail = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="main-content">
                 {/* Tabs */}
-                <div className="bg-white border-b border-gray-200 px-6">
-                    <div className="flex space-x-8">
+                <div className="tabs-header">
+                    <div className="tabs-list">
                         <button
                             onClick={() => setActiveTab('tasks')}
-                            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === 'tasks' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                            className={`tab-button ${activeTab === 'tasks' ? 'active' : ''}`}
                         >
                             <List className="h-4 w-4" />
                             <span>Tasks</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('gantt')}
-                            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === 'gantt' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                            className={`tab-button ${activeTab === 'gantt' ? 'active' : ''}`}
                         >
                             <BarChart2 className="h-4 w-4" />
                             <span>Gantt</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('calendar')}
-                            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === 'calendar' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                            className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
                         >
                             <CalendarIcon className="h-4 w-4" />
                             <span>Calendar</span>
@@ -98,7 +99,7 @@ const ProjectDetail = () => {
                 </div>
 
                 {/* Tab Content */}
-                <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+                <div className="tab-content">
                     {activeTab === 'tasks' && <TasksView tasks={tasks} projectId={id} onUpdate={refreshTasks} />}
                     {activeTab === 'gantt' && <GanttView tasks={tasks} />}
                     {activeTab === 'calendar' && <CalendarView tasks={tasks} />}
@@ -141,37 +142,34 @@ const TasksView = ({ tasks, projectId, onUpdate }) => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <form onSubmit={handleAddTask} className="mb-6 flex gap-2">
+        <div className="tasks-view-container">
+            <form onSubmit={handleAddTask} className="add-task-form">
                 <input
                     type="text"
                     placeholder="Add a new task..."
-                    className="flex-1 p-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
+                    className="task-input"
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                 />
-                <button type="submit" className="bg-primary text-white px-6 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                <button type="submit" className="btn-add-task">
                     Add
                 </button>
             </form>
 
-            <div className="space-y-3">
+            <div className="tasks-list">
                 {tasks.map(task => (
-                    <div key={task._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between group hover:shadow-md transition-shadow">
-                        <div className="flex items-center space-x-4">
+                    <div key={task._id} className="task-item group">
+                        <div className="task-left">
                             <button
                                 onClick={() => handleStatusChange(task._id, task.status)}
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${task.status === 'done' ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-primary'}`}
+                                className={`task-checkbox ${task.status === 'done' ? 'checked' : ''}`}
                             >
                                 {task.status === 'done' && <CheckCircleIcon className="w-3 h-3 text-white" />}
                             </button>
-                            <span className={`${task.status === 'done' ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{task.title}</span>
+                            <span className={`task-title ${task.status === 'done' ? 'completed' : ''}`}>{task.title}</span>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${task.priority === 'high' ? 'bg-red-100 text-red-700' :
-                                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-blue-100 text-blue-700'
-                                }`}>
+                            <span className={`priority-badge ${task.priority}`}>
                                 {task.priority}
                             </span>
                         </div>
@@ -183,7 +181,7 @@ const TasksView = ({ tasks, projectId, onUpdate }) => {
 };
 
 const GanttView = ({ tasks }) => {
-    if (tasks.length === 0) return <div className="text-center text-gray-500 mt-10">No tasks with dates to display.</div>;
+    if (tasks.length === 0) return <div className="empty-gantt">No tasks with dates to display.</div>;
 
     // Transform tasks for the library
     const ganttTasks = tasks
@@ -199,10 +197,10 @@ const GanttView = ({ tasks }) => {
             styles: { progressColor: '#4F46E5', progressSelectedColor: '#4338ca' }
         }));
 
-    if (ganttTasks.length === 0) return <div className="text-center text-gray-500 mt-10">Add start and end dates to tasks to see them here.</div>;
+    if (ganttTasks.length === 0) return <div className="empty-gantt">Add start and end dates to tasks to see them here.</div>;
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+        <div className="gantt-container">
             <Gantt
                 tasks={ganttTasks}
                 viewMode={ViewMode.Day}
@@ -217,16 +215,16 @@ const CalendarView = ({ tasks }) => {
     const days = Array.from({ length: 35 }, (_, i) => i + 1);
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="grid grid-cols-7 gap-4 mb-4 text-center font-medium text-gray-400">
+        <div className="calendar-container">
+            <div className="calendar-header">
                 <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
             </div>
-            <div className="grid grid-cols-7 gap-4">
+            <div className="calendar-grid">
                 {days.map(day => (
-                    <div key={day} className="min-h-[100px] border border-gray-100 rounded-lg p-2 relative hover:bg-gray-50 transition-colors">
-                        <span className="text-sm text-gray-400">{day <= 30 ? day : ''}</span>
+                    <div key={day} className="calendar-day">
+                        <span className="day-number">{day <= 30 ? day : ''}</span>
                         {day <= 30 && tasks.slice(0, 2).map((task, i) => (
-                            <div key={i} className="mt-1 text-xs bg-primary/10 text-primary px-1 py-0.5 rounded truncate">
+                            <div key={i} className="calendar-task">
                                 {task.title}
                             </div>
                         ))}
