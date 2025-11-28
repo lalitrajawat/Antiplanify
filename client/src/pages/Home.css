@@ -1,0 +1,240 @@
+.home-container {
+    max-width: 80rem;
+    /* max-w-7xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem 1rem;
+}
+
+@media (min-width: 640px) {
+    .home-container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .home-container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+.home-header {
+    margin-bottom: 2rem;
+}
+
+.home-title {
+    font-size: 1.875rem;
+    /* text-3xl */
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.home-date {
+    color: var(--gray-500);
+    margin-top: 0.25rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+@media (min-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.stat-card {
+    background-color: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.blue {
+    background-color: #eff6ff;
+    /* blue-50 */
+    color: #2563eb;
+    /* blue-600 */
+}
+
+.stat-icon.red {
+    background-color: #fef2f2;
+    /* red-50 */
+    color: #dc2626;
+    /* red-600 */
+}
+
+.stat-icon.green {
+    background-color: #f0fdf4;
+    /* green-50 */
+    color: #16a34a;
+    /* green-600 */
+}
+
+.stat-icon svg {
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.pinned-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    /* text-xl */
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.view-all-link {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.view-all-link:hover {
+    color: var(--color-primary-hover);
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .projects-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.project-card-link {
+    display: block;
+    text-decoration: none;
+}
+
+.project-card {
+    background-color: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+    transition: all 0.2s;
+}
+
+.project-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.project-title {
+    font-weight: 700;
+    color: var(--gray-900);
+    transition: color 0.2s;
+}
+
+.project-card-link:hover .project-title {
+    color: var(--color-primary);
+}
+
+.tech-badge {
+    background-color: var(--gray-100);
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.project-desc {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    background-color: var(--gray-100);
+    border-radius: 9999px;
+    height: 0.5rem;
+}
+
+.progress-bar-fill {
+    background-color: var(--color-primary);
+    height: 0.5rem;
+    border-radius: 9999px;
+    transition: width 0.5s ease-in-out;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2.5rem;
+    background-color: var(--color-white);
+    border-radius: 0.75rem;
+    border: 1px dashed var(--gray-300);
+}
+
+.empty-state p {
+    color: var(--gray-500);
+}
+
+.create-link {
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    display: inline-block;
+    text-decoration: none;
+}

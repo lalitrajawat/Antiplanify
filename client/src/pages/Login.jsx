@@ -1,75 +1,91 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import "./Login.css";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const { login } = useAuth();
+export default function LoginPage() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+
         try {
             await login(email, password);
-            navigate('/');
+            navigate("/");
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to login');
+            setError(err.response?.data?.message || "Invalid email or password. Please try again.");
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Welcome back
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
-                        <Link to="/signup" className="font-medium text-primary hover:text-indigo-500">
-                            create a new account
-                        </Link>
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <input
-                                type="email"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                                placeholder="Email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                type="password"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
+        <div className="login-container">
+            <div className="login-box">
 
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-                        >
-                            Sign in
-                        </button>
+                {/* Left Panel (Form) */}
+                <div className="login-left">
+                    <h2 className="login-title">Welcome Back</h2>
+                    <p className="login-subtext">
+                        Don’t have an account? <Link to="/signup">Sign up here</Link>
+                    </p>
+
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="email"
+                            placeholder="Email address"
+                            className="login-input"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            className="login-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+
+                        {error && <div className="error-message">{error}</div>}
+
+                        <div className="login-row">
+                            <div className="login-remember">
+                                <input type="checkbox" id="remember" />
+                                <label htmlFor="remember">Remember me</label>
+                            </div>
+                            <Link to="/forgot-password" className="login-forgot">
+                                Forgot password?
+                            </Link>
+                        </div>
+
+                        <button type="submit" className="login-btn">Login</button>
+                    </form>
+
+                    <div className="login-row">
+                        <button className="login-btn small">Google</button>
+                        <button className="login-btn small">Apple</button>
                     </div>
-                </form>
+                </div>
+
+                {/* Right panel */}
+                <div className="login-right">
+                    <img src="/assets/loginIMG.png" alt="login visual" className="login-img" />
+                    <div className="login-overlay">
+                        <div className="login-header">
+                            <img src="src/assets/logo.png" alt="logo" id="logoIMG" />
+                            <h1 className="logo">lanify</h1>
+                        </div>
+                        <p className="login-tagline">One step closer to your goals — log in now.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     );
-};
-
-export default Login;
+}

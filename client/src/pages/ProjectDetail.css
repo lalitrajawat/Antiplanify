@@ -1,0 +1,323 @@
+.loading-container {
+    padding: 2rem;
+    text-align: center;
+}
+
+.project-detail-container {
+    display: flex;
+    height: calc(100vh - 64px);
+}
+
+.project-sidebar {
+    width: 20rem;
+    /* w-80 */
+    background-color: var(--color-white);
+    border-right: 1px solid var(--gray-200);
+    padding: 1.5rem;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+.project-title {
+    font-size: 1.5rem;
+    /* text-2xl */
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.project-desc {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tech-badge {
+    background-color: var(--gray-100);
+    color: var(--gray-600);
+    /* text-gray-700 in jsx but 600 is fine */
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.timeline-text {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tabs-header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--gray-200);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.tabs-list {
+    display: flex;
+    gap: 2rem;
+    /* space-x-8 */
+}
+
+.tab-button {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    border-bottom: 2px solid transparent;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-500);
+    background: none;
+    cursor: pointer;
+}
+
+.tab-button:hover {
+    color: var(--gray-600);
+    /* text-gray-700 */
+}
+
+.tab-button.active {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: var(--gray-50);
+    padding: 1.5rem;
+}
+
+/* Tasks View */
+.tasks-view-container {
+    max-width: 56rem;
+    /* max-w-4xl */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.add-task-form {
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.task-input {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+.task-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.btn-add-task {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-add-task:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.task-item {
+    background-color: var(--color-white);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s;
+}
+
+.task-item:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.task-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    border: 2px solid var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.task-checkbox:hover {
+    border-color: var(--color-primary);
+}
+
+.task-checkbox.checked {
+    background-color: #22c55e;
+    /* green-500 */
+    border-color: #22c55e;
+}
+
+.task-title {
+    color: var(--gray-900);
+}
+
+.task-title.completed {
+    color: var(--gray-400);
+    text-decoration: line-through;
+}
+
+.priority-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.priority-badge.high {
+    background-color: #fee2e2;
+    /* red-100 */
+    color: #b91c1c;
+    /* red-700 */
+}
+
+.priority-badge.medium {
+    background-color: #fef9c3;
+    /* yellow-100 */
+    color: #a16207;
+    /* yellow-700 */
+}
+
+.priority-badge.low {
+    background-color: #dbeafe;
+    /* blue-100 */
+    color: #1d4ed8;
+    /* blue-700 */
+}
+
+/* Gantt View */
+.empty-gantt {
+    text-align: center;
+    color: var(--gray-500);
+    margin-top: 2.5rem;
+}
+
+.gantt-container {
+    background-color: var(--color-white);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+    overflow-x: auto;
+}
+
+/* Calendar View */
+.calendar-container {
+    background-color: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+    color: var(--gray-400);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.calendar-day {
+    min-height: 100px;
+    border: 1px solid var(--gray-100);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: var(--gray-50);
+}
+
+.day-number {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+}
+
+.calendar-task {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    background-color: rgba(79, 70, 229, 0.1);
+    /* primary/10 */
+    color: var(--color-primary);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
