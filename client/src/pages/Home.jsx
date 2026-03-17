@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import api from "../utils/api";
 import { Link } from "react-router-dom";
 import {
@@ -11,7 +11,7 @@ import {
     LayoutDashboard,
     ListTodo,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import "./Home.css";
 
 const Home = () => {
@@ -24,6 +24,7 @@ const Home = () => {
 
     const [pinnedProjects, setPinnedProjects] = useState([]);
     const [todayTasks, setTodayTasks] = useState([]);
+    const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,7 +33,15 @@ const Home = () => {
                 const pinned = projects.filter((p) => p.pinned);
                 setPinnedProjects(pinned);
 
-                // Simple derived stats (adjust later when you have real tasks API)
+                // Fetch Today's Tasks
+                const { data: tasks } = await api.get("/tasks/today");
+                setTodayTasks(tasks);
+
+                // Fetch Notifications
+                const { data: notifs } = await api.get("/notifications");
+                setNotifications(notifs);
+
+                // Simple derived stats
                 const completed = projects.filter((p) => (p.progress || 0) === 100).length;
 
                 setStats((prev) => ({
@@ -40,19 +49,21 @@ const Home = () => {
                     totalProjects: projects.length,
                     completedTasks: completed,
                 }));
-
-                // TEMP demo tasks – replace with real API when ready
-                setTodayTasks([
-                    { id: 1, title: "Design wireframes", priority: "High" },
-                    { id: 2, title: "Refactor task service", priority: "Medium" },
-                    { id: 3, title: "Update Gantt dates", priority: "Low" },
-                ]);
             } catch (error) {
                 console.error("Error fetching dashboard data", error);
             }
         };
         fetchData();
     }, []);
+
+    const markNotifRead = async (id) => {
+        try {
+            await api.put(`/notifications/${id}`);
+            setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
+        } catch (err) {
+            console.error("Error marking notification as read:", err);
+        }
+    };
 
     const avgProgress =
         pinnedProjects.length > 0
@@ -106,17 +117,21 @@ const Home = () => {
                     </div>
 
                     <ul className="todo-list">
-                        {todayTasks.map((task) => (
-                            <li key={task.id} className="todo-item">
-                                <div className="todo-left">
-                                    <input type="checkbox" className="todo-checkbox" />
-                                    <span className="todo-text">{task.title}</span>
-                                </div>
-                                <span className={`priority-pill ${task.priority.toLowerCase()}`}>
-                                    {task.priority}
-                                </span>
-                            </li>
-                        ))}
+                        {todayTasks.length === 0 ? (
+                            <p className="empty-mini">No tasks for today! Enjoy your day ✨</p>
+                        ) : (
+                            todayTasks.map((task) => (
+                                <li key={task._id} className="todo-item">
+                                    <div className="todo-left">
+                                        <input type="checkbox" className="todo-checkbox" checked={task.status === 'done'} readOnly />
+                                        <span className="todo-text">{task.title}</span>
+                                    </div>
+                                    <span className={`priority-pill ${task.priority.toLowerCase()}`}>
+                                        {task.priority}
+                                    </span>
+                                </li>
+                            ))
+                        )}
                     </ul>
                 </section>
 
@@ -168,22 +183,22 @@ const Home = () => {
                     </div>
 
                     <ul className="notifications-list">
-                        <li className="notification-item">
-                            <p className="notification-title">Fix bugs in Task Manager</p>
-                            <span className="notification-meta">Today · 4:30 PM</span>
-                        </li>
-                        <li className="notification-item">
-                            <p className="notification-title">
-                                Project &quot;E-commerce Website&quot; marked as complete
-                            </p>
-                            <span className="notification-meta">Yesterday · 6:12 PM</span>
-                        </li>
-                        <li className="notification-item">
-                            <p className="notification-title">
-                                Upcoming deadline: &quot;Database setup&quot;
-                            </p>
-                            <span className="notification-meta">In 3 days</span>
-                        </li>
+                        {notifications.length === 0 ? (
+                            <p className="empty-mini">No notifications yet.</p>
+                        ) : (
+                            notifications.map(n => (
+                                <li 
+                                    key={n._id} 
+                                    className={`notification-item ${!n.isRead ? 'unread' : ''}`}
+                                    onClick={() => markNotifRead(n._id)}
+                                >
+                                    <p className="notification-title">{n.message}</p>
+                                    <span className="notification-meta">
+                                        {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                    </span>
+                                </li>
+                            ))
+                        )}
                     </ul>
                 </section>
 
@@ -238,17 +253,21 @@ const Home = () => {
                     </div>
 
                     <div className="task-list">
-                        {todayTasks.map((task) => (
-                            <div key={task.id} className="task-card">
-                                <div>
-                                    <p className="task-title">{task.title}</p>
-                                    <span className="task-status">Today</span>
+                        {todayTasks.length === 0 ? (
+                            <p className="empty-mini">No tasks found.</p>
+                        ) : (
+                            todayTasks.map((task) => (
+                                <div key={task._id} className="task-card">
+                                    <div>
+                                        <p className="task-title">{task.title}</p>
+                                        <span className="task-status">Due today</span>
+                                    </div>
+                                    <span className={`priority-pill ${task.priority.toLowerCase()}`}>
+                                        {task.priority}
+                                    </span>
                                 </div>
-                                <span className={`priority-pill ${task.priority.toLowerCase()}`}>
-                                    {task.priority}
-                                </span>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </section>
 

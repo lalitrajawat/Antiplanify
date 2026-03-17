@@ -1,7 +1,7 @@
 import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -79,7 +79,7 @@ export default function LoginPage() {
                     <div className="login-overlay">
                         <div className="login-header">
                             <img src="src/assets/logo.png" alt="logo" id="logoIMG" />
-                            <h1 className="logo">lanify</h1>
+                            <h1 className="logo">Planify</h1>
                         </div>
                         <p className="login-tagline">One step closer to your goals — log in now.</p>
                     </div>

@@ -1,7 +1,7 @@
 import "./Signup.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Signup() {
     const [firstName, setFirstName] = useState("");
@@ -44,7 +44,7 @@ export default function Signup() {
                     <div className="signup-overlay">
                         <div className="signup-header">
                             <img src="src/assets/logo.png" alt="logo" id="logoIMG" />
-                            <h1 className="logo">lanify</h1>
+                            <h1 className="logo">Planify</h1>
                         </div>
                         <p className="signup-tagline">
                             Ideas grow when you begin — sign up now.

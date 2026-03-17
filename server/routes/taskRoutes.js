@@ -4,7 +4,8 @@ const {
     getTasks,
     createTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    getTasksToday
 } = require('../controllers/taskController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -14,11 +15,13 @@ router.use(protect);
 router.route('/')
     .post(createTask);
 
-router.route('/:id')
-    .put(updateTask)
-    .delete(deleteTask);
+router.get('/today', getTasksToday);
 
 // Get tasks for a specific project
 router.get('/project/:projectId', getTasks);
+
+router.route('/:id')
+    .put(updateTask)
+    .delete(deleteTask);
 
 module.exports = router;

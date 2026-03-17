@@ -49,6 +49,73 @@
     background-color: var(--color-primary-hover);
 }
 
+/* 🛠️ Project Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.project-card:hover .card-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--gray-200);
+    color: var(--gray-500);
+    width: 32px;
+    height: 32px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.action-btn.active {
+    color: var(--color-primary);
+    background: rgba(79, 70, 229, 0.1);
+    border-color: var(--color-primary);
+}
+
+.action-btn.danger:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+/* Modal Header Improvement */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.close-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -113,6 +180,7 @@
     flex-grow: 1;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

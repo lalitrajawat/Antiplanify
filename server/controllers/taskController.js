@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const Notification = require('../models/Notification');
 
 // @desc    Get tasks for a project
 // @route   GET /api/projects/:projectId/tasks
@@ -69,6 +70,14 @@ const updateTask = async (req, res) => {
             { new: true }
         );
 
+        // 🔔 Notification if completed
+        if (req.body.status === 'done' && task.status !== 'done') {
+            await Notification.create({
+                userId: req.user._id,
+                message: `Task completed: ${updatedTask.title}`
+            });
+        }
+
         res.json(updatedTask);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -99,9 +108,39 @@ const deleteTask = async (req, res) => {
     }
 };
 
+// @desc    Get tasks due today
+// @route   GET /api/tasks/today
+// @access  Private
+const getTasksToday = async (req, res) => {
+    try {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Find projects owned by the user
+        const projects = await Project.find({ owner: req.user._id });
+        const projectIds = projects.map(p => p._id);
+
+        const tasks = await Task.find({
+            projectId: { $in: projectIds },
+            endDate: {
+                $gte: startOfDay,
+                $lte: endOfDay
+            }
+        });
+
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getTasks,
     createTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    getTasksToday
 };

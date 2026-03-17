@@ -31,15 +31,13 @@ const taskSchema = new mongoose.Schema({
     endDate: {
         type: Date
     },
-    isCompleted: {
-        type: Boolean,
-        default: false
-    },
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }
 }, { timestamps: true });
+
+taskSchema.index({ projectId: 1 });
 
 const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;

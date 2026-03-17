@@ -21,7 +21,9 @@ const userSchema = new mongoose.Schema({
     avatarUrl: {
         type: String,
         default: ''
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
 }, { timestamps: true });
 
 // Method to check password

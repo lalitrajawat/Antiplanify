@@ -20,10 +20,14 @@ mongoose
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+
+// 🧠 AI Chatbot Route
+app.use('/api/chat', require('./routes/chatRoutes'));   // 👈 Added this line
 
 // Basic Route
 app.get('/', (req, res) => {
-    res.send('Planify API is running');
+    res.send('Planify API is running 🚀');
 });
 
 // Start Server

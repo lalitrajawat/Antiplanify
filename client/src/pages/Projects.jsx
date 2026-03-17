@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
-import { Plus, Search, Pin } from 'lucide-react';
+import { Plus, Search, Pin, Trash2, Edit2, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import './Projects.css';
 
 const Projects = () => {
@@ -14,11 +15,13 @@ const Projects = () => {
         startDate: '',
         endDate: ''
     });
+    const [editingProject, setEditingProject] = useState(null);
+    const location = useLocation();
 
-    // ⬇️ Moved function above useEffect to fix error
-    const fetchProjects = async () => {
+    const fetchProjects = async (query = "") => {
         try {
-            const { data } = await api.get('/projects');
+            const endpoint = query ? `/projects?search=${query}` : '/projects';
+            const { data } = await api.get(endpoint);
             setProjects(data);
         } catch (error) {
             console.error('Error fetching projects:', error);
@@ -26,23 +29,68 @@ const Projects = () => {
     };
 
     useEffect(() => {
-        (async () => {
-            await fetchProjects();
-        })();
-    }, []);
+        const query = new URLSearchParams(location.search).get('search');
+        if (query) {
+            fetchProjects(query);
+        } else {
+            fetchProjects();
+        }
+    }, [location.search]);
 
     const handleCreateProject = async (e) => {
         e.preventDefault();
         try {
             const stackArray = newProject.techStack.split(',').map(s => s.trim());
-            await api.post('/projects', { ...newProject, techStack: stackArray });
+            if (editingProject) {
+                await api.put(`/projects/${editingProject._id}`, { ...newProject, techStack: stackArray });
+            } else {
+                await api.post('/projects', { ...newProject, techStack: stackArray });
+            }
 
             setIsModalOpen(false);
-            fetchProjects(); // refresh
+            setEditingProject(null);
+            fetchProjects(); 
             setNewProject({ title: '', description: '', techStack: '', startDate: '', endDate: '' });
         } catch (error) {
-            console.error('Error creating project:', error);
+            console.error('Error creating/updating project:', error);
         }
+    };
+
+    const handleDelete = async (e, id) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!window.confirm("Are you sure you want to delete this project?")) return;
+        try {
+            await api.delete(`/projects/${id}`);
+            fetchProjects();
+        } catch (err) {
+            console.error("Error deleting project:", err);
+        }
+    };
+
+    const handlePin = async (e, project) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            await api.put(`/projects/${project._id}`, { pinned: !project.pinned });
+            fetchProjects();
+        } catch (err) {
+            console.error("Error pinning project:", err);
+        }
+    };
+
+    const openEdit = (e, project) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setEditingProject(project);
+        setNewProject({
+            title: project.title,
+            description: project.description,
+            techStack: project.techStack.join(', '),
+            startDate: project.startDate ? project.startDate.split('T')[0] : '',
+            endDate: project.endDate ? project.endDate.split('T')[0] : ''
+        });
+        setIsModalOpen(true);
     };
 
     return (
@@ -62,7 +110,17 @@ const Projects = () => {
                         <div className="project-card">
                             <div className="project-card-header">
                                 <h3 className="project-card-title">{project.title}</h3>
-                                {project.pinned && <Pin className="h-4 w-4 text-primary fill-current" />}
+                                <div className="card-actions">
+                                    <button onClick={(e) => handlePin(e, project)} className={`action-btn ${project.pinned ? 'active' : ''}`}>
+                                        <Pin size={16} />
+                                    </button>
+                                    <button onClick={(e) => openEdit(e, project)} className="action-btn">
+                                        <Edit2 size={16} />
+                                    </button>
+                                    <button onClick={(e) => handleDelete(e, project._id)} className="action-btn danger">
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
                             </div>
 
                             <p className="project-card-desc">{project.description}</p>
@@ -96,7 +154,10 @@ const Projects = () => {
             {isModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2 className="modal-title">Create New Project</h2>
+                        <div className="modal-header">
+                            <h2 className="modal-title">{editingProject ? 'Edit Project' : 'Create New Project'}</h2>
+                            <button onClick={() => { setIsModalOpen(false); setEditingProject(null); }} className="close-btn"><X /></button>
+                        </div>
 
                         <form onSubmit={handleCreateProject} className="modal-form">
                             <input
@@ -144,7 +205,7 @@ const Projects = () => {
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn-submit">
-                                    Create Project
+                                    {editingProject ? 'Save Changes' : 'Create Project'}
                                 </button>
                             </div>
                         </form>

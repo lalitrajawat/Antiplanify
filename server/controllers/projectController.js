@@ -1,22 +1,30 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
+const Notification = require('../models/Notification');
 const { sendProjectCreatedEmail } = require('../utils/emailService'); // 👈 email helper
 
 // @desc    Get all projects for logged in user
 // @route   GET /api/projects
 // @access  Private
-const getProjects = async(req, res) => {
+const getProjects = async (req, res) => {
     try {
-        const projects = await Project.find({ owner: req.user._id }).sort({ pinned: -1, updatedAt: -1 });
+        const { search } = req.query;
+        let query = { owner: req.user._id };
+
+        if (search) {
+            query.title = { $regex: search, $options: 'i' };
+        }
+
+        const projects = await Project.find(query).sort({ pinned: -1, updatedAt: -1 });
 
         const projectsWithProgress = await Promise.all(
-            projects.map(async(project) => {
+            projects.map(async (project) => {
                 const tasks = await Task.find({ projectId: project._id });
                 const totalTasks = tasks.length;
                 const completedTasks = tasks.filter(task => task.status === 'done').length;
                 const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-                return {...project.toObject(), progress };
+                return { ...project.toObject(), progress };
             })
         );
 
@@ -29,7 +37,7 @@ const getProjects = async(req, res) => {
 // @desc    Create a new project
 // @route   POST /api/projects
 // @access  Private
-const createProject = async(req, res) => {
+const createProject = async (req, res) => {
     const { title, description, startDate, endDate, techStack, pinned, emailAlerts, notes } = req.body;
 
     try {
@@ -46,10 +54,20 @@ const createProject = async(req, res) => {
         });
 
         // 📧 Send confirmation mail (non-blocking)
+        console.log('Attempting to send email to:', req.user?.email);
         if (req.user && req.user.email) {
             sendProjectCreatedEmail(req.user.email, project.title)
+                .then(() => console.log('Email promise resolved'))
                 .catch(err => console.error('Error sending project created email:', err));
+        } else {
+            console.warn('No email found for user:', req.user);
         }
+
+        // 🔔 Create Notification
+        await Notification.create({
+            userId: req.user._id,
+            message: `New project created: ${project.title}`
+        });
 
         res.status(201).json(project);
     } catch (error) {
@@ -60,7 +78,7 @@ const createProject = async(req, res) => {
 // @desc    Get single project
 // @route   GET /api/projects/:id
 // @access  Private
-const getProjectById = async(req, res) => {
+const getProjectById = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id);
 
@@ -81,7 +99,7 @@ const getProjectById = async(req, res) => {
 // @desc    Update project
 // @route   PUT /api/projects/:id
 // @access  Private
-const updateProject = async(req, res) => {
+const updateProject = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id);
 
@@ -107,7 +125,7 @@ const updateProject = async(req, res) => {
 // @desc    Delete project
 // @route   DELETE /api/projects/:id
 // @access  Private
-const deleteProject = async(req, res) => {
+const deleteProject = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id);
 
