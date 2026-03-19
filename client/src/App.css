@@ -30,7 +30,10 @@
     flex-direction: column;
     overflow: hidden;
     background: var(--bg-app);
+    transition: margin-left 0.3s ease;
 }
+
+/* Removed empty ruleset */
 
 .app-page {
     flex: 1;

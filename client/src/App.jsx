@@ -32,6 +32,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent({ darkMode, onToggleDark }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
 
@@ -56,10 +57,18 @@ function AppContent({ darkMode, onToggleDark }) {
   return (
     <div className="app-shell">
       {user && (
-        <Sidebar darkMode={darkMode} onToggleDark={onToggleDark} />
+        <Sidebar
+          darkMode={darkMode}
+          onToggleDark={onToggleDark}
+          collapsed={sidebarCollapsed}
+        />
       )}
-      <div className="app-main">
-        <Topbar />
+      <div className={`app-main ${sidebarCollapsed ? "collapsed" : ""}`}>
+        <Topbar
+          darkMode={darkMode}
+          onToggleDark={onToggleDark}
+          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
         <div className="app-page">
           <Routes>
             <Route path="/login" element={<Login />} />

@@ -4,11 +4,12 @@ import { Search, Bell, Menu, Sun, Moon, Settings, User, LogOut } from 'lucide-re
 import { useAuth } from '../hooks/useAuth';
 import './Topbar.css';
 
-export default function Topbar({ darkMode, onToggleDark }) {
+export default function Topbar({ darkMode, onToggleDark, onToggleSidebar }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     const handleSearch = (e) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -28,7 +29,11 @@ export default function Topbar({ darkMode, onToggleDark }) {
     return (
         <header className="topbar">
             <div className="topbar-left">
-                <button className="topbar-menu-btn" aria-label="Menu">
+                <button 
+                    className="topbar-menu-btn" 
+                    aria-label="Menu"
+                    onClick={onToggleSidebar}
+                >
                     <Menu size={20} />
                 </button>
 
@@ -55,10 +60,48 @@ export default function Topbar({ darkMode, onToggleDark }) {
                 </button>
 
                 {/* Notifications */}
-                <button className="topbar-notifications-btn" aria-label="Notifications">
-                    <Bell size={18} />
-                    <span className="notification-badge">3</span>
-                </button>
+                <div className="topbar-notifications">
+                    <button 
+                        className="topbar-notifications-btn" 
+                        aria-label="Notifications"
+                        onClick={() => setShowNotifications(!showNotifications)}
+                    >
+                        <Bell size={18} />
+                        <span className="notification-badge">3</span>
+                    </button>
+
+                    {showNotifications && (
+                        <div className="notifications-dropdown">
+                            <div className="notifications-header">
+                                <h4>Notifications</h4>
+                                <button className="mark-read">Mark all as read</button>
+                            </div>
+                            <div className="notifications-list">
+                                <div className="notification-item unread">
+                                    <div className="notif-icon">📁</div>
+                                    <div className="notif-content">
+                                        <p>New project <strong>Website Redesign</strong> shared with you.</p>
+                                        <span>2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div className="notification-item unread">
+                                    <div className="notif-icon">✅</div>
+                                    <div className="notif-content">
+                                        <p>You completed <strong>Design System</strong> task.</p>
+                                        <span>5 hours ago</span>
+                                    </div>
+                                </div>
+                                <div className="notification-item">
+                                    <div className="notif-icon">💬</div>
+                                    <div className="notif-content">
+                                        <p>Sarah mentioned you in <strong>Database Migration</strong>.</p>
+                                        <span>Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 {/* User Menu */}
                 <div className="topbar-user-menu">
@@ -108,11 +151,14 @@ export default function Topbar({ darkMode, onToggleDark }) {
                 </div>
             </div>
 
-            {/* Overlay for mobile */}
-            {showUserMenu && (
+            {/* Overlay for mobile/menus */}
+            {(showUserMenu || showNotifications) && (
                 <div
                     className="topbar-overlay"
-                    onClick={() => setShowUserMenu(false)}
+                    onClick={() => {
+                        setShowUserMenu(false);
+                        setShowNotifications(false);
+                    }}
                 ></div>
             )}
         </header>

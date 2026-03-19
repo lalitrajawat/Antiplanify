@@ -115,6 +115,7 @@ export default function Home() {
     const [aiMsg, setAiMsg] = useState("");
     const [aiReply, setAiReply] = useState("Ask me anything about your projects...");
     const [aiLoading, setAiLoading] = useState(false);
+    const [activeMenu, setActiveMenu] = useState(null); // 'completion', 'progress', etc.
 
     useEffect(() => {
         const load = async () => {
@@ -221,7 +222,19 @@ export default function Home() {
                     <div className="panel">
                         <div className="panel-head">
                             <h3>Task Completion</h3>
-                            <button className="panel-action">⚙</button>
+                            <div className="panel-menu-wrap">
+                                <button 
+                                    className="panel-action"
+                                    onClick={() => setActiveMenu(activeMenu === 'completion' ? null : 'completion')}
+                                >⚙</button>
+                                {activeMenu === 'completion' && (
+                                    <div className="panel-dropdown">
+                                        <button onClick={() => setActiveMenu(null)}>Edit Widgets</button>
+                                        <button onClick={() => setActiveMenu(null)}>Export PDF</button>
+                                        <button className="delete" onClick={() => setActiveMenu(null)}>Remove</button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="task-completion-body">
                             <DonutChart
@@ -311,7 +324,19 @@ export default function Home() {
                     <div className="panel">
                         <div className="panel-head">
                             <h3>Project Progress</h3>
-                            <button className="panel-action">···</button>
+                            <div className="panel-menu-wrap">
+                                <button 
+                                    className="panel-action"
+                                    onClick={() => setActiveMenu(activeMenu === 'progress' ? null : 'progress')}
+                                >···</button>
+                                {activeMenu === 'progress' && (
+                                    <div className="panel-dropdown">
+                                        <button onClick={() => setActiveMenu(null)}>View Details</button>
+                                        <button onClick={() => setActiveMenu(null)}>Refresh Data</button>
+                                        <button className="delete" onClick={() => setActiveMenu(null)}>Archive All</button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="pp-list">
                             {topProjects.length === 0 && <p className="tc-empty">No projects yet</p>}
@@ -432,6 +457,11 @@ export default function Home() {
 
                 </div>
             </div>
+
+            {/* Global Overlay for Menus */}
+            {activeMenu && (
+                <div className="home-overlay" onClick={() => setActiveMenu(null)} />
+            )}
         </div>
     );
 }

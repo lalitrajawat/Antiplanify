@@ -8,7 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 import api from '../utils/api';
 import './Sidebar.css';
 
-export default function Sidebar({ darkMode, onToggleDark }) {
+export default function Sidebar({ darkMode, onToggleDark, collapsed }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [pinnedProjects, setPinnedProjects] = useState([]);
@@ -40,7 +40,7 @@ export default function Sidebar({ darkMode, onToggleDark }) {
     ];
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
             {/* Logo */}
             <div className="sidebar-logo">
                 <div className="sidebar-logo-icon">
@@ -48,8 +48,8 @@ export default function Sidebar({ darkMode, onToggleDark }) {
                         <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                 </div>
-                <span className="sidebar-logo-text">AntiPlanify</span>
-                <ChevronDown size={14} className="sidebar-logo-chevron" />
+                {!collapsed && <span className="sidebar-logo-text">AntiPlanify</span>}
+                {!collapsed && <ChevronDown size={14} className="sidebar-logo-chevron" />}
             </div>
 
             {/* Nav Links */}
@@ -65,13 +65,13 @@ export default function Sidebar({ darkMode, onToggleDark }) {
                         onClick={disabled ? e => e.preventDefault() : undefined}
                     >
                         <span className="sidebar-link-icon">{icon}</span>
-                        <span>{label}</span>
+                        {!collapsed && <span>{label}</span>}
                     </NavLink>
                 ))}
             </nav>
 
             {/* Pinned projects */}
-            {pinnedProjects.length > 0 && (
+            {!collapsed && pinnedProjects.length > 0 && (
                 <div className="sidebar-section">
                     <p className="sidebar-section-label">
                         <Pin size={12} /> Pinned
@@ -92,30 +92,34 @@ export default function Sidebar({ darkMode, onToggleDark }) {
                 </div>
             )}
 
-            <div className="sidebar-section">
-                <button className="sidebar-link sidebar-invite-btn">
-                    <Users size={18} />
-                    <span>Invite Members</span>
-                </button>
-            </div>
+            {!collapsed && (
+                <div className="sidebar-section">
+                    <button className="sidebar-link sidebar-invite-btn">
+                        <Users size={18} />
+                        <span>Invite Members</span>
+                    </button>
+                </div>
+            )}
 
             {/* Bottom */}
             <div className="sidebar-bottom">
                 {/* User info */}
                 <div className="sidebar-user">
                     <div className="sidebar-avatar">{initials}</div>
-                    <div className="sidebar-user-info">
-                        <p className="sidebar-user-name">{user?.name}</p>
-                        <p className="sidebar-user-email">{user?.email}</p>
-                    </div>
+                    {!collapsed && (
+                        <div className="sidebar-user-info">
+                            <p className="sidebar-user-name">{user?.name}</p>
+                            <p className="sidebar-user-email">{user?.email}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Dark mode toggle */}
                 <div className="sidebar-dark-toggle">
                     {darkMode ? <Moon size={15} /> : <Sun size={15} />}
-                    <span>Dark Mode</span>
+                    {!collapsed && <span>Dark Mode</span>}
                     <button
-                        className={`toggle-switch ${darkMode ? 'on' : ''}`}
+                        className={`toggle-switch ${darkMode ? 'on' : ''} ${collapsed ? 'collapsed' : ''}`}
                         onClick={onToggleDark}
                         aria-label="Toggle dark mode"
                     >
@@ -126,7 +130,7 @@ export default function Sidebar({ darkMode, onToggleDark }) {
                 {/* Logout */}
                 <button className="sidebar-logout" onClick={handleLogout}>
                     <LogOut size={16} />
-                    <span>Logout</span>
+                    {!collapsed && <span>Logout</span>}
                 </button>
             </div>
         </aside>

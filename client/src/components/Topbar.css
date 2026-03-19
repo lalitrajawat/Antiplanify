@@ -9,6 +9,9 @@
     flex-shrink: 0;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .topbar-left {
@@ -148,6 +151,85 @@
     align-items: center;
     justify-content: center;
     border: 2px solid var(--bg-topbar);
+}
+
+.topbar-notifications {
+    position: relative;
+}
+
+.notifications-dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    width: 320px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-xl);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.notifications-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.notifications-header h4 {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+}
+
+.mark-read {
+    font-size: var(--font-size-xs);
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+}
+
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: var(--bg-card-hover);
+}
+
+.notification-item.unread {
+    background: var(--color-primary-soft);
+}
+
+.notif-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notif-content p {
+    font-size: var(--font-size-sm);
+    margin: 0 0 4px;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.notif-content span {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
 }
 
 
@@ -298,7 +380,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 999;
+    z-index: 990;
+    background: transparent;
 }
 
 
