@@ -4,40 +4,44 @@ const client = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
-const handleChat = async (req, res) => {
-    try {
-        const { message, projectContext } = req.body;
+const handleChat = async(req, res) => {
+        try {
+            const { message, projectContext } = req.body;
 
-        if (!message || !message.trim()) {
-            return res.json({ reply: "Bol na kuch 😄" });
-        }
+            if (!message) {
+                return res.status(400).json({ error: "Message is required" });
+            }
 
-        let systemPrompt = "You are Planify AI assistant. Friendly, fun and helpful. Reply in short, casual Hinglish with emojis, and help with productivity, tasks, and projects.";
-        
-        if (projectContext) {
-            systemPrompt += `\n\nCurrent Project Context:
-            Title: ${projectContext.title}
-            Description: ${projectContext.description}
-            Tasks: ${JSON.stringify(projectContext.tasks)}`;
-        }
+            // Create a system prompt that includes project context
+            const systemPrompt = `You are Planify Assistant, an AI helper for a project management app called Planify.
+You help users with project management tasks, planning, task organization, and productivity.
 
-        const response = await client.chat.completions.create({
-            model: "llama3-8b-8192",
+${projectContext ? `Current project context: ${JSON.stringify(projectContext)}` : ''}
+
+Be helpful, friendly, and focused on project management. Keep responses concise but informative.`;
+
+        const chatCompletion = await client.chat.completions.create({
             messages: [
                 {
                     role: "system",
                     content: systemPrompt,
                 },
-                { role: "user", content: message },
+                {
+                    role: "user",
+                    content: message,
+                },
             ],
+            model: "llama3-8b-8192",
+            temperature: 0.7,
+            max_tokens: 1024,
         });
 
-        const aiReply = response.choices?.[0]?.message?.content || "Kuch samajh nahi aaya 😅";
+        const reply = chatCompletion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now.";
 
-        return res.json({ reply: aiReply });
+        res.json({ reply });
     } catch (error) {
         console.error("Chat error:", error);
-        return res.json({ reply: "Error aa gaya 😭 Chat bot thoda sad ho gaya." });
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 

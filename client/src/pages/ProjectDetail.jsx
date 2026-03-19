@@ -1,7 +1,7 @@
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addMonths, subMonths, addDays } from 'date-fns';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { LayoutDashboard, Calendar as CalendarIcon, List, BarChart2, CheckCircle as CheckCircleIcon } from 'lucide-react';
+import { LayoutDashboard, Calendar as CalendarIcon, List, BarChart2, CheckCircle as CheckCircleIcon, Plus, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import "gantt-task-react/dist/index.css";
 import './ProjectDetail.css';
 import ChatbotWidget from '../components/ChatbotWidget';
@@ -43,31 +43,64 @@ const ProjectDetail = () => {
         }
     };
 
-    if (loading) return <div className="loading-container">Loading project...</div>;
-    if (!project) return <div className="loading-container">Project not found</div>;
+    if (loading) return (
+        <div className="loading-container">
+            <div className="loader"></div>
+            <p>Gathering project insights...</p>
+        </div>
+    );
+
+    if (!project) return (
+        <div className="error-container">
+            <h3>Project not found</h3>
+            <p>The project you're looking for might have been moved or deleted.</p>
+        </div>
+    );
 
     return (
         <div className="project-detail-container">
             {/* Sidebar */}
             <div className="project-sidebar">
-                <h1 className="project-title">{project.title}</h1>
+                <div className="sidebar-header">
+                    <h1 className="project-title">{project.title}</h1>
+                    <div className="project-status-badge">active</div>
+                </div>
                 <p className="project-desc">{project.description}</p>
 
                 <div className="sidebar-section">
                     <h3 className="sidebar-section-title">Tech Stack</h3>
                     <div className="tech-stack">
-                        {project.techStack.map((tech, i) => (
+                        {project.techStack?.map((tech, i) => (
                             <span key={i} className="tech-badge">{tech}</span>
-                        ))}
+                        )) || <span className="text-muted">No tech stack defined</span>}
                     </div>
                 </div>
 
                 <div className="sidebar-section">
                     <h3 className="sidebar-section-title">Timeline</h3>
-                    <div className="timeline-text">
-                        <p>Start: {project.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : 'Not set'}</p>
-                        <p>End: {project.endDate ? format(new Date(project.endDate), 'MMM d, yyyy') : 'Not set'}</p>
+                    <div className="timeline-info">
+                        <div className="timeline-row">
+                            <span className="label">Start</span>
+                            <span className="value">{project.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : 'Not set'}</span>
+                        </div>
+                        <div className="timeline-row">
+                            <span className="label">End</span>
+                            <span className="value">{project.endDate ? format(new Date(project.endDate), 'MMM d, yyyy') : 'Not set'}</span>
+                        </div>
                     </div>
+                </div>
+
+                <div className="sidebar-section">
+                    <h3 className="sidebar-section-title">Progress</h3>
+                    <div className="project-progress-bar">
+                        <div 
+                            className="progress-fill" 
+                            style={{ width: `${tasks.length > 0 ? (tasks.filter(t => t.status === 'done').length / tasks.length * 100) : 0}%` }}
+                        ></div>
+                    </div>
+                    <p className="progress-text">
+                        {tasks.filter(t => t.status === 'done').length} / {tasks.length} tasks completed
+                    </p>
                 </div>
             </div>
 
@@ -80,28 +113,28 @@ const ProjectDetail = () => {
                             onClick={() => setActiveTab('tasks')}
                             className={`tab-button ${activeTab === 'tasks' ? 'active' : ''}`}
                         >
-                            <List className="h-4 w-4" />
+                            <List size={18} />
                             <span>Tasks</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('gantt')}
-                            className={`tab-button ${activeTab === 'gantt' ? 'active' : ''}`}
-                        >
-                            <BarChart2 className="h-4 w-4" />
-                            <span>Gantt</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('kanban')}
                             className={`tab-button ${activeTab === 'kanban' ? 'active' : ''}`}
                         >
-                            <LayoutDashboard className="h-4 w-4" />
+                            <LayoutDashboard size={18} />
                             <span>Kanban</span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('gantt')}
+                            className={`tab-button ${activeTab === 'gantt' ? 'active' : ''}`}
+                        >
+                            <BarChart2 size={18} />
+                            <span>Gantt Chart</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('calendar')}
                             className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
                         >
-                            <CalendarIcon className="h-4 w-4" />
+                            <CalendarIcon size={18} />
                             <span>Calendar</span>
                         </button>
                     </div>
@@ -137,8 +170,8 @@ const TasksView = ({ tasks, projectId, onUpdate }) => {
                 title: newTaskTitle,
                 status: 'todo',
                 priority: 'medium',
-                startDate: new Date(), // Default to today
-                endDate: new Date(Date.now() + 86400000) // Default to tomorrow
+                startDate: new Date(),
+                endDate: addDays(new Date(), 1)
             });
             setNewTaskTitle('');
             onUpdate();
@@ -162,35 +195,49 @@ const TasksView = ({ tasks, projectId, onUpdate }) => {
             <form onSubmit={handleAddTask} className="add-task-form">
                 <input
                     type="text"
-                    placeholder="Add a new task..."
+                    placeholder="Capture a new idea or task..."
                     className="task-input"
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                 />
                 <button type="submit" className="btn-add-task">
-                    Add
+                    <Plus size={18} />
+                    <span>Add Task</span>
                 </button>
             </form>
 
             <div className="tasks-list">
-                {tasks.map(task => (
-                    <div key={task._id} className="task-item group">
-                        <div className="task-left">
-                            <button
-                                onClick={() => handleStatusChange(task._id, task.status)}
-                                className={`task-checkbox ${task.status === 'done' ? 'checked' : ''}`}
-                            >
-                                {task.status === 'done' && <CheckCircleIcon className="w-3 h-3 text-white" />}
-                            </button>
-                            <span className={`task-title ${task.status === 'done' ? 'completed' : ''}`}>{task.title}</span>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <span className={`priority-badge ${task.priority}`}>
-                                {task.priority}
-                            </span>
-                        </div>
+                {tasks.length === 0 ? (
+                    <div className="empty-state">
+                        <Zap size={40} className="empty-icon" />
+                        <h3>Your task list is clean!</h3>
+                        <p>Start by adding your first task above.</p>
                     </div>
-                ))}
+                ) : (
+                    tasks.map(task => (
+                        <div key={task._id} className="task-item group">
+                            <div className="task-left">
+                                <button
+                                    onClick={() => handleStatusChange(task._id, task.status)}
+                                    className={`task-checkbox ${task.status === 'done' ? 'checked' : ''}`}
+                                >
+                                    {task.status === 'done' && <CheckCircleIcon size={14} className="text-white" />}
+                                </button>
+                                <div className="task-info">
+                                    <span className={`task-title ${task.status === 'done' ? 'completed' : ''}`}>{task.title}</span>
+                                    {task.endDate && (
+                                        <span className="task-due-date">Due {format(new Date(task.endDate), 'MMM d')}</span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="task-right">
+                                <span className={`priority-badge ${task.priority}`}>
+                                    {task.priority}
+                                </span>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
@@ -221,7 +268,10 @@ const KanbanView = ({ tasks, onUpdate }) => {
             <div className="kanban-board">
                 {Object.entries(columns).map(([id, column]) => (
                     <div key={id} className="kanban-column">
-                        <h3 className="column-title">{column.title} <span>{column.items.length}</span></h3>
+                        <div className="column-header">
+                            <h3 className="column-title">{column.title}</h3>
+                            <span className="column-count">{column.items.length}</span>
+                        </div>
                         <Droppable droppableId={id}>
                             {(provided) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="column-content">
@@ -236,8 +286,13 @@ const KanbanView = ({ tasks, onUpdate }) => {
                                                 >
                                                     <p>{task.title}</p>
                                                     <div className="card-footer">
-                                                        <span className="priority-dot"></span>
-                                                        <span className="card-priority">{task.priority}</span>
+                                                        <div className={`priority-tag ${task.priority}`}>
+                                                            <span className="dot"></span>
+                                                            {task.priority}
+                                                        </div>
+                                                        {task.endDate && (
+                                                            <span className="due-date">{format(new Date(task.endDate), 'MMM d')}</span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}
@@ -255,7 +310,25 @@ const KanbanView = ({ tasks, onUpdate }) => {
 };
 
 const GanttView = ({ tasks }) => {
-    if (tasks.length === 0) return <div className="empty-gantt">No tasks with dates to display.</div>;
+    const [viewMode, setViewMode] = useState(ViewMode.Week);
+    const [columnWidth, setColumnWidth] = useState(100);
+
+    const getTaskProgress = (task) => {
+        switch (task.status) {
+            case 'done': return 100;
+            case 'doing': return 50;
+            default: return 0;
+        }
+    };
+
+    const getTaskColor = (task) => {
+        switch (task.priority) {
+            case 'high': return { progressColor: '#ef4444', progressSelectedColor: '#dc2626', barColor: 'rgba(239, 68, 68, 0.2)' };
+            case 'medium': return { progressColor: '#f59e0b', progressSelectedColor: '#d97706', barColor: 'rgba(245, 158, 11, 0.2)' };
+            case 'low': return { progressColor: '#10b981', progressSelectedColor: '#059669', barColor: 'rgba(16, 185, 129, 0.2)' };
+            default: return { progressColor: '#8b5cf6', progressSelectedColor: '#7c3aed', barColor: 'rgba(139, 92, 246, 0.2)' };
+        }
+    };
 
     const ganttTasks = tasks
         .filter(t => t.startDate && t.endDate)
@@ -265,21 +338,73 @@ const GanttView = ({ tasks }) => {
             name: t.title,
             id: t._id,
             type: 'task',
-            progress: t.status === 'done' ? 100 : 0,
-            isDisabled: true,
-            styles: { progressColor: '#c4a5ff', progressSelectedColor: '#8b5cf6' }
+            progress: getTaskProgress(t),
+            isDisabled: false,
+            styles: getTaskColor(t),
+            dependencies: t.dependencies || [],
+            fontSize: '12px',
+            project: 'Project'
         }));
 
-    if (ganttTasks.length === 0) return <div className="empty-gantt">Add start and end dates to tasks to see them here.</div>;
+    if (ganttTasks.length === 0) {
+        return (
+            <div className="empty-state-gantt">
+                <BarChart2 size={60} className="empty-icon" />
+                <h3>No Timeline Data</h3>
+                <p>Add start and end dates to your tasks to visualize them here.</p>
+            </div>
+        );
+    }
+
+    const handleViewModeChange = (mode) => {
+        setViewMode(mode);
+        switch (mode) {
+            case ViewMode.Day: setColumnWidth(60); break;
+            case ViewMode.Week: setColumnWidth(100); break;
+            case ViewMode.Month: setColumnWidth(150); break;
+            case ViewMode.Quarter: setColumnWidth(200); break;
+        }
+    };
 
     return (
-        <div className="gantt-container">
-            <Gantt
-                tasks={ganttTasks}
-                viewMode={ViewMode.Day}
-                columnWidth={60}
-                listCellWidth=""
-            />
+        <div className="gantt-wrapper">
+            <div className="gantt-header-controls">
+                <div className="view-mode-selector">
+                    {Object.values(ViewMode).filter(v => ['Day', 'Week', 'Month', 'Quarter'].includes(v)).map(mode => (
+                        <button
+                            key={mode}
+                            className={`mode-btn ${viewMode === mode ? 'active' : ''}`}
+                            onClick={() => handleViewModeChange(mode)}
+                        >
+                            {mode}
+                        </button>
+                    ))}
+                </div>
+                <div className="gantt-summary">
+                    <span>{ganttTasks.length} tasks scheduled</span>
+                </div>
+            </div>
+
+            <div className="gantt-chart-container">
+                <Gantt
+                    tasks={ganttTasks}
+                    viewMode={viewMode}
+                    columnWidth={columnWidth}
+                    listCellWidth="280px"
+                    headerHeight={60}
+                    rowHeight={50}
+                    barCornerRadius={8}
+                    handleSize={8}
+                />
+            </div>
+
+            <div className="gantt-footer">
+                <div className="legend">
+                    <div className="legend-item"><span className="dot high"></span> High</div>
+                    <div className="legend-item"><span className="dot medium"></span> Medium</div>
+                    <div className="legend-item"><span className="dot low"></span> Low</div>
+                </div>
+            </div>
         </div>
     );
 };
@@ -289,30 +414,18 @@ const CalendarView = ({ tasks }) => {
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
+    const calendarStart = startOfWeek(monthStart);
+    const calendarEnd = endOfWeek(monthEnd);
 
-    const dateFormat = "MMMM yyyy";
     const rows = [];
     let days = [];
-    let day = startDate;
-    let formattedDate = "";
+    let day = calendarStart;
 
-    const onDateClick = (day) => {
-        // Handle date click
-    };
+    const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+    const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
-    const nextMonth = () => {
-        setCurrentDate(addMonths(currentDate, 1));
-    };
-
-    const prevMonth = () => {
-        setCurrentDate(subMonths(currentDate, 1));
-    };
-
-    while (day <= endDate) {
+    while (day <= calendarEnd) {
         for (let i = 0; i < 7; i++) {
-            formattedDate = format(day, "d");
             const cloneDay = day;
             const dayTasks = tasks.filter(t => 
                 t.startDate && isSameDay(new Date(t.startDate), cloneDay)
@@ -320,26 +433,21 @@ const CalendarView = ({ tasks }) => {
 
             days.push(
                 <div
-                    className={`calendar-cell-mini ${!isSameMonth(day, monthStart) ? "disabled" : isSameDay(day, new Date()) ? "today" : ""}`}
-                    key={day}
+                    className={`calendar-day ${!isSameMonth(day, monthStart) ? "outside" : ""} ${isSameDay(day, new Date()) ? "today" : ""}`}
+                    key={day.toString()}
                 >
-                    <span className="number">{formattedDate}</span>
-                    <div className="day-tasks-mini">
+                    <span className="day-number">{format(day, "d")}</span>
+                    <div className="day-tasks">
                         {dayTasks.map(t => (
-                            <div key={t._id} className={`task-dot priority-${t.priority}`}></div>
+                            <div key={t._id} className={`task-indicator priority-${t.priority}`} title={t.title}></div>
                         ))}
                     </div>
                 </div>
             );
-            day = addMonths(day, 0); // dummy for date-fns but we need to increment day
-            // Wait, day = addDays(day, 1) is what I need. But I didn't import addDays.
-            // Let's use vanilla JS for incrementing day to avoid re-importing.
-            const nextDay = new Date(day);
-            nextDay.setDate(nextDay.getDate() + 1);
-            day = nextDay;
+            day = addDays(day, 1);
         }
         rows.push(
-            <div className="calendar-row-mini" key={day}>
+            <div className="calendar-week" key={day.toString()}>
                 {days}
             </div>
         );
@@ -347,13 +455,18 @@ const CalendarView = ({ tasks }) => {
     }
 
     return (
-        <div className="calendar-mini-wrap">
-            <div className="calendar-mini-header">
-                <button onClick={prevMonth}>&lt;</button>
-                <span>{format(currentDate, dateFormat)}</span>
-                <button onClick={nextMonth}>&gt;</button>
+        <div className="calendar-custom-container">
+            <div className="calendar-header">
+                <button className="nav-btn" onClick={prevMonth}><ChevronLeft size={20} /></button>
+                <h2>{format(currentDate, "MMMM yyyy")}</h2>
+                <button className="nav-btn" onClick={nextMonth}><ChevronRight size={20} /></button>
             </div>
-            <div className="calendar-mini-body">{rows}</div>
+            <div className="calendar-grid">
+                <div className="weekdays">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => <div key={d}>{d}</div>)}
+                </div>
+                <div className="calendar-body">{rows}</div>
+            </div>
         </div>
     );
 };

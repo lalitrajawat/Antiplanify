@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../utils/api";
-import { Lock, Loader2, CheckCircle } from "lucide-react";
-import "./Login.css";
+import { Lock, Loader2, CheckCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { Link } from "react-router-dom";
+import "./Auth.css";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -35,52 +36,79 @@ const ResetPassword = () => {
 
   if (success) {
     return (
-      <div className="login-page">
-        <div className="login-card success-card">
-          <CheckCircle size={60} color="#10b981" />
-          <h1>Success!</h1>
-          <p>Your password has been reset. Redirecting to login...</p>
+      <div className="auth-page">
+        <div className="auth-card auth-card-centered text-center">
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-6)' }}>
+            <CheckCircle size={80} color="var(--color-success)" />
+          </div>
+          <h1 className="auth-title">Success!</h1>
+          <p className="auth-subtitle">Your password has been reset successfully.</p>
+          <div className="auth-message success" style={{ marginTop: 'var(--space-4)' }}>
+            Redirecting you to login in a few seconds...
+          </div>
+          <Link to="/login" className="auth-btn" style={{ marginTop: 'var(--space-6)' }}>
+            Go to Login Now
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Reset Password</h1>
-          <p>Enter your new password below</p>
+    <div className="auth-page">
+      <div className="auth-card auth-card-centered">
+        <div className="auth-header text-center">
+          <h1 className="auth-title">Reset Password</h1>
+          <p className="auth-subtitle">Enter your new password below</p>
         </div>
 
-        {error && <div className="error-msg">{error}</div>}
+        {error && <div className="auth-message error">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="input-group">
-            <Lock size={20} />
-            <input
-              type="password"
-              placeholder="New Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <Lock size={20} />
-            <input
-              type="password"
-              placeholder="Confirm New Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-form-group">
+            <label className="auth-label">New Password</label>
+            <div className="auth-input-wrapper">
+              <Lock className="auth-input-icon" size={20} />
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="auth-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? <Loader2 className="spinner" /> : "Reset Password"}
+          <div className="auth-form-group">
+            <label className="auth-label">Confirm Password</label>
+            <div className="auth-input-wrapper">
+              <Lock className="auth-input-icon" size={20} />
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="auth-input"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? <Loader2 className="spinner" size={20} /> : (
+              <>
+                <RefreshCw size={20} />
+                <span>Reset Password</span>
+              </>
+            )}
           </button>
         </form>
+
+        <Link to="/login" className="auth-back-link">
+          <ArrowLeft size={16} />
+          <span>Back to Login</span>
+        </Link>
       </div>
     </div>
   );

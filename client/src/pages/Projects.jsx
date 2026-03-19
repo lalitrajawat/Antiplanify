@@ -31,6 +31,7 @@ const Projects = () => {
     useEffect(() => {
         const query = new URLSearchParams(location.search).get('search');
         if (query) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             fetchProjects(query);
         } else {
             fetchProjects();

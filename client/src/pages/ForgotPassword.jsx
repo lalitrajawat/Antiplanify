@@ -1,8 +1,8 @@
 import { useState } from "react";
 import api from "../utils/api";
-import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, Send } from "lucide-react";
 import { Link } from "react-router-dom";
-import "./Login.css"; // Reuse login styles
+import "./Auth.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -27,38 +27,46 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Forgot Password</h1>
-          <p>Enter your email to receive a reset link</p>
+    <div className="auth-page">
+      <div className="auth-card auth-card-centered">
+        <div className="auth-header text-center">
+          <h1 className="auth-title">Forgot Password</h1>
+          <p className="auth-subtitle">Enter your email to receive a reset link</p>
         </div>
 
-        {message && <div className="success-msg">{message}</div>}
-        {error && <div className="error-msg">{error}</div>}
+        {message && <div className="auth-message success">{message}</div>}
+        {error && <div className="auth-message error">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="input-group">
-            <Mail size={20} />
-            <input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-form-group">
+            <label className="auth-label">Email Address</label>
+            <div className="auth-input-wrapper">
+              <Mail className="auth-input-icon" size={20} />
+              <input
+                type="email"
+                placeholder="name@company.com"
+                className="auth-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? <Loader2 className="spinner" /> : "Send Reset Link"}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? <Loader2 className="spinner" size={20} /> : (
+              <>
+                <Send size={20} />
+                <span>Send Reset Link</span>
+              </>
+            )}
           </button>
         </form>
 
-        <div className="login-footer">
-          <Link to="/login" className="back-link">
-            <ArrowLeft size={16} /> Back to Login
-          </Link>
-        </div>
+        <Link to="/login" className="auth-back-link">
+          <ArrowLeft size={16} />
+          <span>Back to Login</span>
+        </Link>
       </div>
     </div>
   );

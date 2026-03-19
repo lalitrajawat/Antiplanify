@@ -1,202 +1,503 @@
-/* 📋 Kanban Board */
-.kanban-board {
+/* 🚀 Project Detail Layout */
+.project-detail-container {
     display: flex;
-    gap: 1.5rem;
-    height: 100%;
-    min-width: fit-content;
+    gap: 2rem;
+    padding: 1.5rem;
+    height: calc(100vh - 80px);
+    background: var(--color-bg-main, #0a0a0c);
+    color: var(--color-text-primary, #fff);
 }
 
-.kanban-column {
-    width: 20rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: 1rem;
+/* 📂 Sidebar */
+.project-sidebar {
+    width: 320px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.5rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 200px);
+    gap: 2rem;
+    backdrop-filter: blur(10px);
 }
 
-.column-title {
-    padding: 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-primary);
+.sidebar-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
 }
 
-.column-title span {
-    background: rgba(196, 165, 255, 0.1);
-    color: var(--color-accent-main);
-    padding: 2px 10px;
-    border-radius: 999px;
+.project-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.project-status-badge {
+    padding: 4px 12px;
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.project-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary, rgba(255, 255, 255, 0.6));
+    margin: 0;
+}
+
+.sidebar-section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+    margin-bottom: 1rem;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tech-badge {
+    padding: 4px 10px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    color: var(--color-accent-main, #8B5CF6);
+    border-radius: 6px;
     font-size: 0.75rem;
 }
 
-.column-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.75rem;
+.timeline-info {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.kanban-card {
-    background: var(--color-panel-elevated);
-    border: 1px solid var(--color-border-subtle);
-    padding: 1.25rem;
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-z1);
-    cursor: grab;
-    transition: all 0.2s;
-}
-
-.kanban-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-z2);
-    border-color: var(--color-accent-main);
-}
-
-.kanban-card p {
-    margin: 0 0 1rem 0;
-    font-size: 0.95rem;
-    color: var(--color-text-primary);
-    line-height: 1.5;
-}
-
-.card-footer {
+.timeline-row {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.timeline-row .label { color: rgba(255, 255, 255, 0.4); }
+.timeline-row .value { color: white; font-weight: 500; }
+
+.project-progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8B5CF6, #C084FC);
+    transition: width 1s ease-out;
+}
+
+.progress-text {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* 💻 Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0; /* Important for overflow */
+}
+
+.tabs-header {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tabs-list {
+    display: flex;
     gap: 0.5rem;
 }
 
-.priority-dot {
+.tab-button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: white;
+}
+
+.tab-button.active {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-accent-main, #8B5CF6);
+    box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.2);
+}
+
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* 📋 Tasks View */
+.add-task-form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.task-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-add-task {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-accent-main, #8B5CF6);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-task:hover {
+    background: var(--color-accent-hover, #7C3AED);
+    transform: translateY(-2px);
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.task-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.task-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.task-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.task-checkbox.checked {
+    background: #4ade80;
+    border-color: #4ade80;
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-title {
+    font-weight: 500;
+}
+
+.task-title.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.task-due-date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.priority-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.priority-badge.high { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.priority-badge.medium { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.priority-badge.low { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+/* 📊 Gantt Chart */
+.gantt-wrapper {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.gantt-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-mode-selector {
+    display: flex;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.mode-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mode-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.gantt-chart-container {
+    background: transparent;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* Custom styles for the Gantt library */
+.gantt-chart-container :global(.gantt_container) {
+    background: transparent;
+}
+
+.gantt-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.legend {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.legend-item .dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
 }
 
-.card-priority {
-    font-size: 0.75rem;
-    text-transform: capitalize;
-    color: var(--color-text-muted);
+.legend-item .dot.high { background: #ef4444; }
+.legend-item .dot.medium { background: #f59e0b; }
+.legend-item .dot.low { background: #10b981; }
+
+/* 🗓️ Calendar */
+.calendar-custom-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.5rem;
+    padding: 2rem;
 }
 
-.priority-high .priority-dot { background: #ff4d4d; }
-.priority-medium .priority-dot { background: #ffbd2e; }
-.priority-low .priority-dot { background: #00ca4e; }
-
-/* 🗓️ Mini Calendar */
-.calendar-mini-wrap {
-    background: var(--color-panel-elevated);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.calendar-mini-header {
+.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    padding: 0 1rem;
 }
 
-.calendar-mini-header button {
-    background: rgba(255, 255, 255, 0.05);
-    border: none;
-    color: white;
+.calendar-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.nav-btn {
     width: 36px;
     height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
     border-radius: 50%;
-    cursor: pointer;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    transition: all 0.2s;
+    cursor: pointer;
 }
 
-.calendar-mini-header button:hover {
-    background: var(--color-accent-main);
-    color: var(--color-bg-deep);
+.calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.calendar-mini-header span {
-    font-size: 1.1rem;
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.8rem;
     font-weight: 700;
-    color: var(--color-accent-main);
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
 }
 
-.calendar-mini-body {
+.calendar-body {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.calendar-row-mini {
+.calendar-week {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
 }
 
-.calendar-cell-mini {
+.calendar-day {
     aspect-ratio: 1;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.01);
+    border-radius: 8px;
     padding: 8px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative;
     border: 1px solid transparent;
-    transition: all 0.2s;
 }
 
-.calendar-cell-mini:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(167, 139, 250, 0.3);
-}
-
-.calendar-cell-mini.disabled {
+.calendar-day.outside {
     opacity: 0.2;
-    pointer-events: none;
 }
 
-.calendar-cell-mini.today {
-    background: rgba(167, 139, 250, 0.1);
-    border-color: var(--color-accent-main);
+.calendar-day.today {
+    background: rgba(139, 92, 246, 0.05);
+    border-color: rgba(139, 92, 246, 0.3);
 }
 
-.calendar-cell-mini.today .number {
-    color: var(--color-accent-main);
-    font-weight: 800;
+.day-number {
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
-.number {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-}
-
-.day-tasks-mini {
+.day-tasks {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px;
-    justify-content: flex-end;
+    gap: 2px;
 }
 
-.task-dot {
-    width: 6px;
-    height: 6px;
+.task-indicator {
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
 }
 
-.task-dot.priority-high { background: #ff4d4d; }
-.task-dot.priority-medium { background: #ffbd2e; }
-.task-dot.priority-low { background: #00ca4e; }
+.task-indicator.priority-high { background: #ef4444; }
+.task-indicator.priority-medium { background: #f59e0b; }
+.task-indicator.priority-low { background: #10b981; }
+
+/* 🔄 Utilities */
+.loading-container, .error-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.1);
+    border-top-color: #8B5CF6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.empty-state, .empty-state-gantt {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+}
+
+.empty-icon {
+    color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+}

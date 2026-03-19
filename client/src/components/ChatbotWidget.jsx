@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./ChatbotWidget.css";
 import { useAuth } from "../hooks/useAuth";
+import api from '../utils/api';
+import { Send, X, MessageCircle, Bot, User, Loader2 } from 'lucide-react';
 
 export default function ChatbotWidget({ projectContext }) {
     const { user } = useAuth();
@@ -10,6 +12,17 @@ export default function ChatbotWidget({ projectContext }) {
     ]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            scrollToBottom();
+        }
+    }, [messages, isOpen, isSending]);
 
     const sendMessage = async () => {
         if (!input.trim() || isSending) return;
@@ -20,25 +33,10 @@ export default function ChatbotWidget({ projectContext }) {
         setIsSending(true);
 
         try {
-            const res = await fetch("/api/chat", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}` // Ensure token is sent
-                },
-                body: JSON.stringify({ 
-                    message: userMsg.text,
-                    projectContext: projectContext // 👈 Pass context here
-                }),
+            const { data } = await api.post("/chat", { 
+                message: userMsg.text,
+                projectContext: projectContext 
             });
-
-            if (!res.ok) {
-                const text = await res.text();
-                console.error("Backend error:", res.status, text);
-                throw new Error("Response not OK");
-            }
-
-            const data = await res.json();
 
             const botMsg = {
                 from: "bot",
@@ -47,10 +45,10 @@ export default function ChatbotWidget({ projectContext }) {
 
             setMessages((prev) => [...prev, botMsg]);
         } catch (err) {
-            console.error("Fetch error:", err);
+            console.error("Chat error:", err);
             setMessages((prev) => [
                 ...prev,
-                { from: "bot", text: "Something went wrong 😭" },
+                { from: "bot", text: "Something went wrong. My neural circuits are a bit fuzzy 😭" },
             ]);
         } finally {
             setIsSending(false);
@@ -65,41 +63,74 @@ export default function ChatbotWidget({ projectContext }) {
     };
 
     return (
-        <div className="chatbot-container">
+        <div className={`chatbot-container ${isOpen ? 'open' : ''}`}>
             {isOpen && (
                 <div className="chatbot-window">
                     <div className="chatbot-header">
-                        <span>Planify Assistant 🤖</span>
-                        <button onClick={() => setIsOpen(false)}>✖</button>
+                        <div className="header-info">
+                            <div className="bot-avatar">
+                                <Bot size={20} />
+                            </div>
+                            <div className="bot-status">
+                                <h3>Planify AI</h3>
+                                <span className="status-indicator">Online</span>
+                            </div>
+                        </div>
+                        <button className="close-btn" onClick={() => setIsOpen(false)}>
+                            <X size={20} />
+                        </button>
                     </div>
 
                     <div className="chatbot-messages">
                         {messages.map((m, i) => (
                             <div
                                 key={i}
-                                className={`msg ${m.from === "user" ? "user" : "bot"}`}
+                                className={`msg-wrapper ${m.from === "user" ? "user-wrapper" : "bot-wrapper"}`}
                             >
-                                {m.text}
+                                <div className="msg-avatar">
+                                    {m.from === "user" ? <User size={14} /> : <Bot size={14} />}
+                                </div>
+                                <div className={`msg-bubble ${m.from === "user" ? "user-bubble" : "bot-bubble"}`}>
+                                    {m.text}
+                                </div>
                             </div>
                         ))}
+                        {isSending && (
+                            <div className="msg-wrapper bot-wrapper">
+                                <div className="msg-avatar">
+                                    <Bot size={14} />
+                                </div>
+                                <div className="msg-bubble bot-bubble typing">
+                                    <span className="dot"></span>
+                                    <span className="dot"></span>
+                                    <span className="dot"></span>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="chatbot-input">
+                    <div className="chatbot-input-area">
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={onKeyDown}
-                            placeholder="Ask me anything about Planify..."
+                            placeholder="Type a message..."
+                            rows="1"
                         />
-                        <button onClick={sendMessage} disabled={isSending}>
-                            {isSending ? "..." : "Send"}
+                        <button 
+                            className={`send-btn ${input.trim() ? 'active' : ''}`} 
+                            onClick={sendMessage} 
+                            disabled={!input.trim() || isSending}
+                        >
+                            {isSending ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                         </button>
                     </div>
                 </div>
             )}
 
-            <button className="chatbot-toggle" onClick={() => setIsOpen(!isOpen)}>
-                💬
+            <button className={`chatbot-toggle ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
             </button>
         </div>
     );
