@@ -97,6 +97,13 @@ const ProjectDetail = () => {
                             <LayoutDashboard className="h-4 w-4" />
                             <span>Kanban</span>
                         </button>
+                        <button
+                            onClick={() => setActiveTab('calendar')}
+                            className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
+                        >
+                            <CalendarIcon className="h-4 w-4" />
+                            <span>Calendar</span>
+                        </button>
                     </div>
                 </div>
 

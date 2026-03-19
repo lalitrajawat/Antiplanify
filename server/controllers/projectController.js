@@ -24,7 +24,7 @@ const getProjects = async (req, res) => {
                 const completedTasks = tasks.filter(task => task.status === 'done').length;
                 const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-                return { ...project.toObject(), progress };
+                return { ...project.toObject(), progress, taskCount: totalTasks };
             })
         );
 

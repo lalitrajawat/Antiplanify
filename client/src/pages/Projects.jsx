@@ -135,6 +135,16 @@ const Projects = () => {
                             </div>
 
                             <div className="project-card-footer">
+                                <div className="card-meta-row">
+                                    {project.endDate && (
+                                        <span className="card-deadline">
+                                            📅 {new Date(project.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </span>
+                                    )}
+                                    <span className="card-task-count">
+                                        🗂 {project.taskCount ?? 0} task{project.taskCount !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
                                 <div className="progress-label">
                                     <span>Progress</span>
                                     <span>{project.progress || 0}%</span>
